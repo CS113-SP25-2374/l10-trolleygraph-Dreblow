@@ -83,19 +83,12 @@ class TrolleyGraph {
 
     // Get the weight of a route between two stations
     public int getRouteWeight(String fromStation, String toStation) {
-        TrolleyStation fromTrollyStation = this.getStationByName(fromStation);
-        if (fromTrollyStation == null) {
-            return -1;
+        for (TrolleyRoute route : routes) {
+            if (route.getFromStation().equals(fromStation) && route.getToStation().equals(toStation)) {
+                return route.getWeight();
+            }
         }
-        TrolleyStation toTrollyStation = this.getStationByName(toStation);
-        if (toTrollyStation == null) {
-            return -1;
-        }
-
-        int dx = toTrollyStation.getX() - fromTrollyStation.getX();
-        int dy = toTrollyStation.getY() - fromTrollyStation.getY();
-
-        return (int) Math.round(Math.sqrt(dx * dx + dy * dy));
+        return Integer.MAX_VALUE;
     }
 
     // ********** Breadth First Search (BFS) ********** //
@@ -163,20 +156,33 @@ class TrolleyGraph {
     }
 
     // ********** Dijkstra's Algorithm ********** //
+    // Big-O
+    // Distance array setup: O(V)
+    // Priority queue insert: O(1)
+    // Each poll() from the priority queue: O(log V)
+    // For each neighbor (E total over the whole graph):
+    //  * add() to the priority queue: O(log V)
+    //  * Checking and updating distance: O(1)
+    // Total work: O((V + E) log V)
     public List<String> dijkstra(String startStation, String endStation) {
         // todo: Implement Dijkstra's Algorithm
         Map<String,String> parentMap = new HashMap<>();
-        int[] distances = new int[stations.size()];
 
+        int[] distances = new int[stations.size()];
         for (int i = 0; i < distances.length; i++) {
             distances[i] = Integer.MAX_VALUE;
         }
+        int startIndex = stations.indexOf(getStationByName(startStation));
+        distances[startIndex] = 0;
 
         PriorityQueue<DNode> pq = new PriorityQueue<>();
         pq.add(new DNode(startStation, 0));
 
         while(!pq.isEmpty()) {
             DNode node = pq.poll();
+            if (node.distance > distances[stations.indexOf(getStationByName(node.name))]) {
+                continue; // skip outdated node
+            }
             if (node.name.equals(endStation)) {
                 return reconstructPath(parentMap, startStation, endStation);
             }
@@ -195,7 +201,6 @@ class TrolleyGraph {
                     parentMap.put(neighbor, node.name);
                     distances[j] = distance + weight;
                     DNode dnode = new DNode(neighbor, distances[j]);
-                    pq.remove(dnode);
                     pq.add(dnode);
                 }
             }
@@ -214,8 +219,8 @@ class TrolleyGraph {
         }
 
         @Override
-        public int compareTo(DNode arg0) {
-            return 0;
+        public int compareTo(DNode other) {
+            return Integer.compare(this.distance, other.distance);
         }
         
     }
