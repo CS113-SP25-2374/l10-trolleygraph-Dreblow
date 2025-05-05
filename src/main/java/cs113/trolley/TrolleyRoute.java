@@ -3,10 +3,10 @@ package cs113.trolley;
 import javafx.scene.paint.Color;
 
 class TrolleyRoute {
-    private String fromStation;
-    private String toStation;
-    private int weight;
-    private Color color;
+    private final String fromStation;
+    private final String toStation;
+    private final int weight;
+    private final Color color;
 
     public TrolleyRoute(String fromStation, String toStation, int weight, Color color) {
         this.fromStation = fromStation;

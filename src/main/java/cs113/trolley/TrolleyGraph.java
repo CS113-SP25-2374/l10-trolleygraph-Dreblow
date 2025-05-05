@@ -14,8 +14,8 @@ import javafx.scene.paint.Color;
 
 // ********** Graph Construction ********** //
 class TrolleyGraph {
-    private List<TrolleyStation> stations;
-    private List<TrolleyRoute> routes;
+    private final List<TrolleyStation> stations;
+    private final List<TrolleyRoute> routes;
 
     public TrolleyGraph() {
         stations = new ArrayList<>();
@@ -99,6 +99,10 @@ class TrolleyGraph {
     }
 
     // ********** Breadth First Search (BFS) ********** //
+    // Big-O
+    // Each station (node) is added to the queue and visited once = O(V)
+    // Each route (edge) is examined once when visiting its connected station = O(E)
+    // So the total time complexity is O(V + E)
     public List<String> breadthFirstSearch(String startStation, String endStation) {
         Map<String,String> parentMap = new HashMap<>();
         Set<String> visited = new HashSet<>();
@@ -126,9 +130,36 @@ class TrolleyGraph {
     }
 
     // ********** Depth First Search (DFS) ********** //
+    // Big-O
+    // Every vertex once = O(V)
+    // Every edge once = O(E)
+    // Total Time Complexity is O(V + E)
     public List<String> depthFirstSearch(String startStation, String endStation) {
-        // todo: Implement a DFS (see readme)
-        return null; // No path found
+        Set<String> visited = new HashSet<>();
+        Map<String, String> parentMap = new HashMap<>();
+    
+        boolean found = dfsRecursive(startStation, endStation, visited, parentMap);
+    
+        return found ? reconstructPath(parentMap, startStation, endStation) : null;
+    }
+    
+    private boolean dfsRecursive(String current, String endStation, Set<String> visited, Map<String, String> parentMap) {
+        if (current.equals(endStation)) {
+            return true;
+        }
+    
+        visited.add(current);
+    
+        for (String neighbor : getAdjacentStations(current)) {
+            if (!visited.contains(neighbor)) {
+                parentMap.put(neighbor, current);
+                if (dfsRecursive(neighbor, endStation, visited, parentMap)) {
+                    return true;
+                }
+            }
+        }
+    
+        return false;
     }
 
     // ********** Dijkstra's Algorithm ********** //

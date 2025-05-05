@@ -3,9 +3,9 @@ package cs113.trolley;
 import java.util.Objects;
 
 class TrolleyStation {
-    private String name;
-    private int x;
-    private int y;
+    private final String name;
+    private final int x;
+    private final int y;
 
     public TrolleyStation(String name, int x, int y) {
         this.name = name;
